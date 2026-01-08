@@ -69,3 +69,47 @@ module.exports.delUser = (req, res) => {
       res.status(ERROR_GENERAL).send({ message: 'Erro interno do servidor' });
     });
 };
+
+module.exports.updateMe = (req, res) => {
+  const { name, about } = req.body;
+  const { id } = req.params;
+
+  User.findByIdAndUpdate(id, { name, about }, { new: true })
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE).send({ message: 'ID inválido' });
+      }
+
+      if (err.name === 'DocumentNotFoundError') {
+        return res
+          .status(DOCUMENT_NOTFOUND)
+          .send({ message: 'Usuário não encontrado' });
+      }
+
+      res.status(ERROR_GENERAL).send({ message: 'Erro interno do servidor' });
+    });
+};
+
+module.exports.updateAvatar = (req, res) => {
+  const { id } = req.params;
+  const { avatar } = req.body;
+
+  User.findByIdAndUpdate(id, { avatar }, { new: true })
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE).send({ message: 'ID inválido' });
+      }
+
+      if (err.name === 'DocumentNotFoundError') {
+        return res
+          .status(DOCUMENT_NOTFOUND)
+          .send({ message: 'Avatar não encontrado' });
+      }
+
+      res.status(ERROR_GENERAL).send({ message: 'Erro interno do servidor' });
+    });
+};

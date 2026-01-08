@@ -51,16 +51,34 @@ module.exports.delCard = (req, res) => {
     });
 };
 
-module.exports.likeCard = (req, res) =>
+module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // adicione _id ao array se ele não estiver lá
+    { $addToSet: { likes: req.user._id } },
     { new: true }
-  );
+  )
+    .orFail()
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        return res.status(ERROR_CODE).send({ message: 'Card não encontrado' });
+      }
+      res.status(ERROR_GENERAL).send({ message: err.message });
+    });
+};
 
-module.exports.dislikeCard = (req, res) =>
+module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // remove _id do array
+    { $pull: { likes: req.user._id } },
     { new: true }
-  );
+  )
+    .orFail()
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        return res.status(ERROR_CODE).send({ message: 'Card não encontrado' });
+      }
+      res.status(ERROR_GENERAL).send({ message: err.message });
+    });
+};
