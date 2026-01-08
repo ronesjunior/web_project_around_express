@@ -33,20 +33,34 @@ module.exports.delCard = (req, res) => {
   const { id } = req.params;
   console.log(req);
 
-  // Card.findByIdAndDelete(id)
-  //   .orFail()
-  //   .then((card) => res.send(card))
-  //   .catch((err) => {
-  //     if (err.name === 'CastError') {
-  //       return res.status(ERROR_CODE).send({ message: 'ID inválido' });
-  //     }
+  Card.findByIdAndDelete(id)
+    .orFail()
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE).send({ message: 'ID inválido' });
+      }
 
-  //     if (err.name === 'DocumentNotFoundError') {
-  //       return res
-  //         .status(DOCUMENT_NOTFOUND)
-  //         .send({ message: 'Card não encontrado' });
-  //     }
+      if (err.name === 'DocumentNotFoundError') {
+        return res
+          .status(DOCUMENT_NOTFOUND)
+          .send({ message: 'Card não encontrado' });
+      }
 
-  //     res.status(ERROR_GENERAL).send({ message: 'Erro interno do servidor' });
-  //   });
+      res.status(ERROR_GENERAL).send({ message: 'Erro interno do servidor' });
+    });
 };
+
+module.exports.likeCard = (req, res) =>
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // adicione _id ao array se ele não estiver lá
+    { new: true }
+  );
+
+module.exports.dislikeCard = (req, res) =>
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } }, // remove _id do array
+    { new: true }
+  );
