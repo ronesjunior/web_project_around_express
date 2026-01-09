@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/user');
 const ERROR_CODE = 400;
 const DOCUMENT_NOTFOUND = 404;
 const ERROR_GENERAL = 500;
